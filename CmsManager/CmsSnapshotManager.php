@@ -73,32 +73,6 @@ class CmsSnapshotManager extends BaseCmsPageManager
     /**
      * {@inheritdoc}
      */
-    public function findContainer($name, PageInterface $page, BlockInterface $parentContainer = null)
-    {
-        $container = false;
-
-        if ($parentContainer) {
-            // parent container is set, nothing to find, don't need to loop across the
-            // name to find the correct container (main template level)
-            $container = $parentContainer;
-        }
-
-        // first level blocks are containers
-        if (!$container && $page->getBlocks()) {
-            foreach ($page->getBlocks() as $block) {
-                if ($block->getSetting('name') == $name) {
-                    $container = $block;
-                    break;
-                }
-            }
-        }
-
-        return $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getPageBy(SiteInterface $site = null, $fieldName, $value)
     {
         if ('id' == $fieldName) {

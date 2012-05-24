@@ -22,50 +22,141 @@ use Sonata\CacheBundle\Cache\CacheManagerInterface;
 use Sonata\PageBundle\Model\BlockInteractorInterface;
 
 /**
- *
+ * Test concrete CmsPageManager class
  */
 class CmsPageManagerTest extends \PHPUnit_Framework_TestCase
 {
+    protected $manager;
 
-    public function getManager($services = array())
+    public function setUp()
     {
-        $blocInteractor = isset($services['interactor']) ? $services['interactor'] : $this->getMock('Sonata\PageBundle\Model\BlockInteractorInterface');
-        $pageManager  = $this->getMock('Sonata\PageBundle\Model\PageManagerInterface');
-
-        return new CmsPageManager($pageManager, $blocInteractor);
+        $this->pageManager = $this->getMock('Sonata\PageBundle\Model\PageManagerInterface');
+        $this->blockInteractor = $this->getMockBlockInteractor();
+        $this->manager = new CmsPageManager($this->pageManager, $this->blockInteractor);
     }
 
-    public function testFindContainer()
+    public function testFindContainerWithNullParent()
     {
-        $blockInteractor = $this->getMockBuilder('Sonata\PageBundle\Model\BlockInteractorInterface')->getMock();
+        // GIVEN
+        $page = $this->getMockPageWithParents(null);
 
-        $blockInteractor->expects($this->once())
+        // WHEN
+        $container = $this->manager->findContainer('newOne', $page);
+
+        // THEN
+        $this->assertEquals('newOne', $container->getSetting('name'), 'Should return a new block named "newOne"');
+        $this->assertEquals($page, $container->getPage(), 'Should be a block from page');
+    }
+
+    public function testFindContainerCreatesInPage()
+    {
+        // GIVEN
+        $page = $this->getMockPageWithBlocks(array());
+
+        // WHEN
+        $container = $this->manager->findContainer('newOne', $page);
+
+        // THEN
+        $this->assertEquals('newOne', $container->getSetting('name'), 'Should return a new block named "newOne"');
+        $this->assertEquals($page, $container->getPage(), 'Should be a block from page');
+    }
+
+    public function testFindContainerCreatesInParent()
+    {
+        // GIVEN
+        $parent = $this->getMockPageWithBlocks(array());
+        $page = $this->getMockPageWithParents(array($parent));
+
+        // WHEN
+        $container = $this->manager->findContainer('newOne', $page);
+
+        // THEN
+        $this->assertEquals('newOne', $container->getSetting('name'), 'Should return a new block named "newOne"');
+        $this->assertEquals($parent, $container->getPage(), 'Should be a block from parent');
+    }
+
+    /**
+     * Returns a mock BlockInteractor that mocks the createNewContainer() method
+     * and returns a mock block object with values matching the method's parameters
+     *
+     * @return \Sonata\PageBundle\Model\BlockInteractorInterface
+     */
+    protected function getMockBlockInteractor()
+    {
+        $testCase = $this;
+        $callback = function($array) use ($testCase) {
+
+            $page = $array['page'];
+            $name = $array['name'];
+            $mock = $testCase->getMockBlock($name, $page);
+
+            return $mock;
+        };
+
+        $blockInteractor = $this->getMock('\Sonata\PageBundle\Model\BlockInteractorInterface');
+        $blockInteractor->expects($this->any())
             ->method('createNewContainer')
-            ->will($this->returnCallback(function($options) {
-                $block = new Block;
+            ->will($this->returnCallback($callback));
 
-                $block->setSettings($options);
+        return $blockInteractor;
+    }
 
-                return $block;
-        }));
+    /**
+     * Returns a mock Block object with a given name and page
+     * to mock getSetting() and getPage() methods
+     *
+     * @param string $name Name of block
+     * @param mixed  $page Page object
+     *
+     * @return \Sonata\PageBundle\Model\Block
+     */
+    public function getMockBlock($name, $page)
+    {
+        $block = $this->getMock('\Sonata\PageBundle\Model\Block');
 
+        $block->expects($this->any())
+            ->method('getSetting')
+            ->with($this->equalTo('name'))
+            ->will($this->returnValue($name));
 
-        $manager = $this->getManager(array(
-            'interactor' => $blockInteractor
-        ));
+        $block->expects($this->any())
+            ->method('getPage')
+            ->will($this->returnValue($page));
 
-        $block = new Block;
-        $block->setSettings(array('name' => 'findme'));
+        return $block;
+    }
 
-        $page = new Page;
-        $page->addBlocks($block);
+    /**
+     * Returns a mock Page object with given blocks
+     *
+     * @param array $blocks An array of block objects
+     *
+     * @return \Sonata\PageBundle\Model\PageInterface
+     */
+    protected function getMockPageWithBlocks($blocks)
+    {
+        $page = $this->getMock('\Sonata\PageBundle\Model\PageInterface');
+        $page->expects($this->any())
+            ->method('getBlocks')
+            ->will($this->returnValue($blocks));
 
-        $container = $manager->findContainer('findme', $page);
+        return $page;
+    }
 
-        $this->assertEquals(spl_object_hash($block), spl_object_hash($container));
+    /**
+     * Returns a mock Page object with given parents
+     *
+     * @param array $parents An array of Page objects
+     *
+     * @return \Sonata\PageBundle\Model\PageInterface
+     */
+    protected function getMockPageWithParents($parents)
+    {
+        $page = $this->getMock('\Sonata\PageBundle\Model\PageInterface');
+        $page->expects($this->any())
+            ->method('getParents')
+            ->will($this->returnValue($parents));
 
-        $container = $manager->findContainer('newcontainer', $page);
-
-        $this->assertEquals('newcontainer', $container->getSetting('name'));
+        return $page;
     }
 }

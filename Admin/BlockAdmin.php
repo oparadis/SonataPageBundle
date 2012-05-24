@@ -53,6 +53,7 @@ class BlockAdmin extends Admin
     protected function configureListFields(ListMapper $listMapper)
     {
         $listMapper
+            ->add('name', 'text', array('template' => 'SonataPageBundle:BlockAdmin:field_name.html.twig'))
             ->addIdentifier('type')
             ->add('enabled')
             ->add('updatedAt')

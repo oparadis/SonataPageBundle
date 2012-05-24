@@ -31,9 +31,11 @@ use Symfony\Component\HttpFoundation\Response;
 interface CmsManagerInterface
 {
     /**
-     * @param string                                        $name
-     * @param \Sonata\PageBundle\Model\PageInterface        $page
-     * @param null|\Sonata\BlockBundle\Model\BlockInterface $parentContainer
+     * Returns a block container matching the provided name and page
+     *
+     * @param string                                        $name            Block name
+     * @param \Sonata\PageBundle\Model\PageInterface        $page            Page object
+     * @param null|\Sonata\BlockBundle\Model\BlockInterface $parentContainer Parent Block
      *
      * @return bool|null|\Sonata\BlockBundle\Model\BlockInterface
      */
@@ -42,8 +44,8 @@ interface CmsManagerInterface
     /**
      * Returns a fully loaded page ( + blocks ) from a url
      *
-     * @param \Sonata\PageBundle\Model\SiteInterface $site
-     * @param string                                 $slug
+     * @param \Sonata\PageBundle\Model\SiteInterface $site Site object
+     * @param string                                 $slug Slug name
      *
      * @return \Sonata\PageBundle\Model\PageInterface
      */
@@ -52,8 +54,8 @@ interface CmsManagerInterface
     /**
      * Returns a fully loaded page ( + blocks ) from a route name
      *
-     * @param \Sonata\PageBundle\Model\SiteInterface $site
-     * @param string                                 $routeName
+     * @param \Sonata\PageBundle\Model\SiteInterface $site      Site object
+     * @param string                                 $routeName Route name
      *
      * @return \Sonata\PageBundle\Model\PageInterface
      */
@@ -62,35 +64,36 @@ interface CmsManagerInterface
     /**
      * Returns a fully loaded page ( + blocks ) from an internal page name
      *
-     * @param \Sonata\PageBundle\Model\SiteInterface $site
-     * @param string                                 $routeName
+     * @param \Sonata\PageBundle\Model\SiteInterface $site      Site object
+     * @param string                                 $routeName Route Name
      *
-     * @return string
+     * @return \Sonata\PageBundle\Model\PageInterface
      */
     function getInternalRoute(SiteInterface $site, $routeName);
 
     /**
      * Returns a fully loaded page ( + blocks ) from a name
      *
-     * @param \Sonata\PageBundle\Model\SiteInterface $site
-     * @param string                                 $name
+     * @param \Sonata\PageBundle\Model\SiteInterface $site Site object
+     * @param string                                 $name Page name
      *
      * @return \Sonata\PageBundle\Model\PageInterface
      */
     function getPageByName(SiteInterface $site, $name);
 
     /**
-     * Returns a fully loaded pag ( + blocks ) from a page id
+     * Returns a fully loaded page ( + blocks ) from a page id
      *
-     * @param integer $id
+     * @param integer $id Page Id
      *
      * @return \Sonata\PageBundle\Model\PageInterface
      */
     function getPageById($id);
 
     /**
+     * Returns a Block by its Id
      *
-     * @param integer $id
+     * @param integer $id Block id
      *
      * @return \Sonata\PageBundle\Model\PageInterface
      */
@@ -104,6 +107,8 @@ interface CmsManagerInterface
     function getCurrentPage();
 
     /**
+     * Sets the current page
+     *
      * @param \Sonata\PageBundle\Model\PageInterface $page
      */
     function setCurrentPage(PageInterface $page);
@@ -116,8 +121,10 @@ interface CmsManagerInterface
     function getBlocks();
 
     /**
-     * @param \Sonata\PageBundle\Model\SiteInterface $site
-     * @param string                                 $page
+     * Returns the page object from a mixed page variable
+     *
+     * @param \Sonata\PageBundle\Model\SiteInterface $site Site object
+     * @param mixed                                  $page A mixed value representing a page
      *
      * @return \Sonata\PageBundle\Model\PageInterface
      */

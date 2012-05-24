@@ -95,38 +95,45 @@ class CmsPageManager extends BaseCmsPageManager
     }
 
     /**
+     *
      * {@inheritdoc}
      */
     public function findContainer($name, PageInterface $page, BlockInterface $parentContainer = null)
     {
-        $container = false;
+        $container = parent::findContainer($name, $page, $parentContainer);
 
-        if ($parentContainer) {
-            // parent container is set, nothing to find, don't need to loop across the
-            // name to find the correct container (main template level)
-            $container = $parentContainer;
-        }
-
-        // first level blocks are containers
-        if (!$container && $page->getBlocks()) {
-            foreach ($page->getBlocks() as $block) {
-                if ($block->getSetting('name') == $name) {
-
-                    $container = $block;
-                    break;
-                }
+        // lazy-create container if none was found
+        if (!$container) {
+            if ($page->getParents()) {
+                $parents = $page->getParents();
+                $parent = end($parents);
+                $container = $this->createNewContainer($name, $parent);
+            } else {
+                $container = $this->createNewContainer($name, $page);
             }
         }
 
-        if (!$container) {
-            $container = $this->blockInteractor->createNewContainer(array(
-                'enabled'  => true,
-                'page'     => $page,
-                'name'     => $name,
-                'position' => 1,
-                'parent'   => $parentContainer
-            ));
-        }
+        return $container;
+    }
+
+    /**
+     * Creates a new block container
+     *
+     * @param string                                        $name            Name of Block
+     * @param \Sonata\PageBundle\Model\PageInterface        $page            Page to create Block
+     * @param null|\Sonata\BlockBundle\Model\BlockInterface $parentContainer Parent Block
+     *
+     * @return \Sonata\BlockBundle\Model\BlockInterface
+     */
+    protected function createNewContainer($name, PageInterface $page, BlockInterface $parentContainer = null)
+    {
+        $container = $this->blockInteractor->createNewContainer(array(
+            'enabled'  => true,
+            'page'     => $page,
+            'name'     => $name,
+            'position' => 1,
+            'parent'   => $parentContainer
+        ));
 
         return $container;
     }

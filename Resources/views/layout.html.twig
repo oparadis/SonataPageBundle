@@ -15,20 +15,20 @@ file that was distributed with this source code.
         <div class="content">
             <div class="page-header">
                 <div class="pull-left">
-                    {{ sonata_page_render_container('title', 'global') }}
+                    {{ sonata_page_render_container('title', page) }}
                 </div>
 
                 <div class="pull-right navigation">
-                    {{ sonata_page_render_container('header', 'global') }}
+                    {{ sonata_page_render_container('header', page) }}
                 </div>
 
                 <div style="clear: both"></div>
             </div>
 
             <div class="row">
-                {% if page.name != 'global'%}
-                    {{ sonata_page_render_container('content_top', 'global') }}
-                {% endif %}
+                {#{% if page.parent != null %}#}
+                    {#{{ sonata_page_render_container('content_top', page) }}#}
+                {#{% endif %}#}
                 {{ sonata_page_render_container('content_top', page) }}
             </div>
 
@@ -47,15 +47,14 @@ file that was distributed with this source code.
 
             <div>
                 {{ sonata_page_render_container('content_bottom', page) }}
-
-                {% if page.name != 'global'%}
-                    {{ sonata_page_render_container('content_bottom', 'global') }}
-                {% endif %}
+                {#{% if page.parent != null %}#}
+                    {#{{ sonata_page_render_container('content_bottom', page) }}#}
+                {#{% endif %}#}
             </div>
         </div>
 
         <footer>
-            {{ sonata_page_render_container('footer', 'global') }}
+            {{ sonata_page_render_container('footer', page) }}
         </footer>
     </div>
 {% endblock %}

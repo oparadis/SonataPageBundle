@@ -65,9 +65,10 @@ class PageAdmin extends Admin
     protected function configureListFields(ListMapper $listMapper)
     {
         $listMapper
+            ->add('site')
             ->add('hybrid', 'text', array('template' => 'SonataPageBundle:PageAdmin:field_hybrid.html.twig'))
             ->addIdentifier('name')
-            ->add('site')
+            ->add('parent')
             ->add('decorate')
             ->add('enabled')
             ->add('edited')
