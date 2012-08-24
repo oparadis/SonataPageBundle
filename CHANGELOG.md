@@ -7,6 +7,23 @@ A [BC BREAK] means the update will break the project for many reasons:
 * new dependencies
 * class refactoring
 
+### 2012-08-24
+
+* [BC BREAK] Block::$settings "name" property is now a "code" property.
+
+    Database Migration: (replace table name)
+
+        ALTER TABLE page__bloc ADD name VARCHAR2(255) DEFAULT NULL;
+
+    Migration command: (change entity class as required)
+
+        php app/console sonata:page:migrate-block-name-setting --class="Application\Sonata\PageBundle\Entity\Block"
+
+    Command to update existing blocks and use "code" setting to fill in empty block names
+
+        php app/console sonata:page:update-block-name --class="Application\Sonata\PageBundle\Entity\Block"
+
+
 ### 2012-06-12
 
 * [BC BREAK] Mapped Block::$settings to doctrine JsonType (previously an ArrayType)
