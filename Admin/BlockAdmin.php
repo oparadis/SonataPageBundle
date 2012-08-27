@@ -80,8 +80,9 @@ class BlockAdmin extends Admin
     {
         $block = $this->getSubject();
 
-        // add name on all forms
+        // default fields to add in form
         $formMapper->add('name');
+        $formMapper->add('enabled');
 
         $isContainerRoot = $block && $block->getType() == 'sonata.page.block.container' && !$this->hasParentFieldDescription();
         $isStandardBlock = $block && $block->getType() != 'sonata.page.block.container' && !$this->hasParentFieldDescription();
@@ -100,7 +101,6 @@ class BlockAdmin extends Admin
                 ->add('type', 'sonata_block_service_choice', array(
                     'context' => 'cms'
                 ))
-                ->add('enabled')
                 ->add('position');
         }
     }
